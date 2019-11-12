@@ -1,0 +1,795 @@
+Assignment
+
+NOTE: Do not forget to see manual page using "--help" option in command when searching for options/commands for a particular task.
+
+1. Install Docker, either on your native OS or on a VM. Make sure it runs. Type "docker -v" to check if it's installed.
+
+If you can't install or configure Docker, you can use the online docker setup to do the assignment.
+Step1 Goto:- https://www.katacoda.com/courses/kubernetes/playground
+Step2 Click on "continue" button on the left panel
+Step3 Click on "launch.sh" button on the left panel
+Step4 From the right panel use the top console to execute below command:-
+		docker -v
+
+Try below commands for help
+	docker --help  ---> This command shows all available options and commands to work with images and containers
+	docker image --help ---> This command shows all the avaialble options and commands to work with docker images
+	docker container --help ---> This command shows all the avaialble options and commands to work with docker containers
+
+NOTE:- DO NOT TRY TO USE INTERNET TO SOLVE ASSIGNMENT, BETTER USE THE ABOVE --help OPTION TO SEE THE MANUAL OF ANY PARTICULAR COMMAND AND FIGURE OUT THE SOLUTIONS ON YOUR OWN.
+
+2. Find a image from dockerhub of your choice(recommeded: nginx), don't use browser, pull the official image from dockerhub
+ docker pull hello-world 
+
+3. List all the available images in your machine/vm, make sure you see recently pulled image in the list.
+
+docker images  
+
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        19 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+
+4. Find out the "Full" ImageId of the image that you pulled and write it below. 
+
+  docker inspect hello-world
+  
+  o/p: "Id": "sha256:fce289e99eb9bca977dae136fbe2a82b6b7d4c372474c9235adc1741675f587e",
+
+
+5. Create a container of your image 
+  
+  docker create hello-world
+  
+  o/p:593b504f36aef6d63aa38cdece4b71ff4d75ffa9a96bca0f6718fe1209becba1
+
+6. List all the running containers
+   
+   $ docker  ps    or docker container ps
+
+   o/p:
+   ubuntu@ip-172-31-44-220:~$ docker ps
+    CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+   
+   ubuntu@ip-172-31-44-220:~$ docker container ps
+   CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+   
+7. List all the running and stopped containers
+     
+	 $ docker ps -a.  or docker container ps
+
+   o/p:
+   ubuntu@ip-172-31-44-220:~$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS               NAMES
+593b504f36ae        hello-world         "/hello"            4 minutes ago       Created                                       vigorous_bardeen
+6a1f6829698a        ubuntu              "/bin/bash"         17 hours ago        Exited (0) 16 hours ago                       quizzical_ardinghelli
+
+ubuntu@ip-172-31-44-220:~$ docker container ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS               NAMES
+593b504f36ae        hello-world         "/hello"            5 minutes ago       Created                                       vigorous_bardeen
+6a1f6829698a        ubuntu              "/bin/bash"         17 hours ago        Exited (0) 16 hours ago                       quizzical_ardinghelli
+
+	 
+    Note: all stopped containers: docker container ls --all
+	 
+8. Find out the "Full" containerId of the container and write it below.
+  
+   $docker inspect --format="{{.Id}}" silly_ptolemy  //long id 
+   
+   Ex:
+   
+   ubuntu@ip-172-31-44-220:~$ docker inspect --format="{{.Id}}"  vigorous_bardeen
+   593b504f36aef6d63aa38cdece4b71ff4d75ffa9a96bca0f6718fe1209becba1
+
+  docker inspect imageId //593b504f36ae this is the image id of hello-world
+   ubuntu@ip-172-31-44-220:~$ docker inspect 593b504f36ae
+[
+    {
+        "Id": "593b504f36aef6d63aa38cdece4b71ff4d75ffa9a96bca0f6718fe1209becba1",
+        "Created": "2019-11-08T04:27:50.210945777Z",
+        "Path": "/hello",
+        "Args": [],
+
+   
+9. Find out how many image layers are used to build this image.  
+
+  $docker inspect tomcat:7.0  //10 layers 
+  
+  o/p :
+  
+  "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:97041f29baff775daa9b4f608c11db724fbe406c6478f69721a85df4006ef7c0",
+                "sha256:2f77733e9824e18b358f20bd33ad569f21e3136c2a22ef502c15b627be3c9f5e",
+                "sha256:687890749166493fb9958058143592c3aadf73b6f914f1b15093e8108d47dcd8",
+                "sha256:b8f8aeff56a83bdb007111d2a746c5819d592c6c0a0ddbd4d2e60f5ed5d71dea",
+                "sha256:7e3c900343d08f51118c48e0a7ca914c5532681e345078ef4a222ff2898f7a3a",
+                "sha256:99557920a7c54f7f15f397a839132ef74fcf6e60e5659d6f14f4f10dbef2060f",
+                "sha256:a8902d6047fea645ed2d9e425a947c9f6ffa6ffce6c1df9860a243813a7830ed",
+                "sha256:08579474bb30b0a954f88b0b38ab1ba35f23336d263831ec03abec2fa126b0d1",
+                "sha256:786a5c0501cbfc9073b07d2633affd28875310365defaefdbcb2a3e933439e91",
+                "sha256:b3dee6f8faa6f381864f8ca61fd142c3bfd9313a34778c9cdacec60c926591b7"
+            ]
+
+
+10. Get the Apache Tomcat 7 server image from the docker hub.
+
+    docker pull tomcat:7.0
+	
+11. Run the Apache Tomcat 7, I mean create a container of Apache Tomcat.
+    
+	docker run tomcat:7.0  //cmd running on attached mode
+	 
+->go to the directry where the pem file is existed,open anothe bash use ssh to connect instance
+  ssh -i "practice_docker_on_aws.pem" ubuntu@ec2-18-220-36-76.us-east-2.compute.amazonaws.com
+
+o/p:
+Bash1:
+	
+	ubuntu@ip-172-31-44-220:~$ docker run tomcat:7.0
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: Server version:        Apache Tomcat/7.0.96
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: Server built:          Jul 24 2019 13:00:10 UTC
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: Server number:         7.0.96.0
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: OS Name:               Linux
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: OS Version:            4.15.0-1052-aws
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: Architecture:          amd64
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: Java Home:             /usr/local/openjdk-8/jre
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: JVM Version:           1.8.0_232-b09
+Nov 08, 2019 4:50:11 AM org.apache.catalina.startup.VersionLoggerListener log
+INFO: JVM Vendor:            Oracle Corporation
+Nov 08, 2019 4:50:13 AM org.apache.catalina.startup.Catalina start
+INFO: Server startup in 1645 ms
+
+Bash2:
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+b3177db99279        tomcat:7.0          "catalina.sh run"   About a minute ago   Up About a minute   8080/tcp            relaxed_almeida
+
+12. Find out what is the IP Address of the Apache Tomcat Container that it is running on
+    
+	18.218.1.127 //after creating aws instance we can able to see the IP address.
+	
+	Ex:
+	"NetworkSettings": {
+           
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "92ff0ee294e962802a0add7757d068e47a0126e15cd3462901cef238825660a3",
+                    "EndpointID": "57385007e771e9df01ab1e22688d3eca871ef0529db071756cec86f53ee8396c",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+
+13. Which Port it is using?       ***********************recheck it once**************
+    
+	docker inspect tomcat:7.0 //use this command
+	
+	"ExposedPorts": {
+                "8080/tcp": {}
+            },
+
+14. Try to access the Tomcat's home page from your machine/vm.
+
+  ->created aws ubuntu instance & allowed all trafics in inbiund rules.
+  ->use gitbash in a directry where the pem file got downloaded
+  ->use the command docker run -p 8080:8080 tomcat:7.0
+  ->we can able to see tomcat is running in the git bash cmd
+  ->use A standalone SSH client of the instance : ssh -i "practice_docker_on_aws.pem" ubuntu@ec2-18-218-1-127.us-east-2.compute.amazonaws.com
+    in another gitbash 
+  ->docker ps(hit this command to check tomcat container is running r not.)	
+  ->hit on browser http://18.218.1.127:8080/ 
+  ->we can able to see tomcat home page.
+  
+15. What is the disk size of Apache Tomcat image?
+
+docker images tomcat
+
+Ex:
+  ubuntu@ip-172-31-44-220:~$ docker images tomcat
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+
+   
+16. Find out list of all environment variables that is configured for tomcat image, can you see JAVA_HOME and CATALINA_HOME? What did you notice about it?
+ ->use docker inspect tomcat:7.0 
+ ->we can able to see JAVA_HOME and CATALINA_HOME under Env as shown below.
+ Ex o/p:
+ 
+  "Env": [
+                "PATH=/usr/local/tomcat/bin:/usr/local/openjdk-8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "JAVA_HOME=/usr/local/openjdk-8",
+                "JAVA_VERSION=8u232",
+                "JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u232-b09/OpenJDK8U-jdk_",
+                "JAVA_URL_VERSION=8u232b09",
+                "CATALINA_HOME=/usr/local/tomcat"
+				
+           ]
+   
+17. Find out which port is exposed for tomcat?
+
+  -> docker inspect tomcat:7.0 //use this command
+	
+	"ExposedPorts": {
+                "8080/tcp": {}
+            },
+
+18. Run multiple conntainers of tomcat on different port and access it's home page.
+
+  ->created aws ubuntu instance & allowed all trafics in inbiund rules.
+  ->use gitbash in a directry where the pem file got downloaded
+  ->use the command docker run -p 8080:8080 tomcat:7.0
+  ->we can able to see tomcat is running in the git bash cmd 
+  ->use A standalone SSH client of the instance : ssh -i "practice_docker_on_aws.pem" ubuntu@ec2-18-218-1-127.us-east-2.compute.amazonaws.com
+    in another gitbash 
+  ->docker ps(hit this command to check tomcat container is running r not.)	
+  ->hit on browser http://18.218.1.127:8080/ 
+  ->we can able to see tomcat home page.	
+  
+  ->use the command docker run -p 8081:8080 tomcat:7.0
+  ->we can able to see tomcat is running in the git bash cmd 
+  ->use A standalone SSH client of the instance : ssh -i "practice_docker_on_aws.pem" ubuntu@ec2-18-218-1-127.us-east-2.compute.amazonaws.com
+    in another gitbash 
+  ->docker ps(hit this command to check tomcat container is running r not.)	
+  ->hit on browser hhttp://18.218.1.127:8081/
+	
+	like this way we can change the host & run on multiple ports
+	
+19. Pull ubuntu os from dockerhub, try to pull 2 images of ubuntu, Except the latest one.
+ docker pull ubuntu 
+ docker pull ubuntu:18.04 
+ docker pull ubuntu:14.04 
+ 
+20. Run the container of ubuntu in attached mode.
+1)docker run -d --name sample1 ubuntu /usr/bin/top -b
+2)docker attach sample1
+
+Ex:
+
+ubuntu@ip-172-31-44-220:~$ docker run -d --name sample1 ubuntu /usr/bin/top -b
+a063f55cc66f5d7697fe99a7d53082e0b5e82721237ce7d347c56f53415273a0
+ubuntu@ip-172-31-44-220:~$ docker attach sample1
+
+
+top - 08:15:04 up  3:54,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  1.0 us,  0.7 sy,  0.0 ni, 98.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   140708 free,   438824 used,   428024 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   420996 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3000   2648 R  0.0  0.3   0:00.30 top
+
+top - 08:15:07 up  3:54,  0 users,  load average: 0.00, 0.00, 0.00
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   140708 free,   438820 used,   428028 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   421000 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3000   2648 R  0.0  0.3   0:00.30 top^C
+
+	
+21. Run the container of another ubuntu in detached mode. 
+
+	[docker run -d IMAGE_NAME   
+	docker run --detach IMAGE_NAME
+	docker run -d=true IMAGE_NAME]
+	
+	docker run --name sample -d -it ubuntu
+	
+ubuntu@ip-172-31-44-220:~$ docker run --name sample -d -it ubuntu
+21f7d10bde69dd5604035d5dcbe16a7a517bd0725003529c44fb5f2e9eb18edd
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+21f7d10bde69        ubuntu              "/bin/bash"         5 seconds ago       Up 3 seconds                            sample
+
+
+Note:In detach mode Docker container runs in the background of your terminal. It does not receive input or display output. 
+     If we run containers in the background,we can find out their details using docker ps
+	 
+22. Check how many ubuntu containers are running and stopped
+
+docker ps -a | grep ubuntu
+
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -a | grep ubuntu
+a063f55cc66f        ubuntu              "/usr/bin/top -b"   19 minutes ago      Exited (0) 16 minutes ago                         sample1
+4bfcc1f65561        ubuntu              "/usr/bin/top -b"   25 minutes ago      Exited (0) 23 minutes ago                         topdemo1
+42119280ee18        ubuntu              "/usr/bin"          33 minutes ago      Created                                           topdemo
+55384bf362e8        ubuntu              "/bin/bash"         38 minutes ago      Exited (0) 38 minutes ago                         tes1
+01e3d4f8fcca        ubuntu:latest       "/bin/bash"         43 minutes ago      Exited (0) 42 minutes ago                         determined_jackson
+6a1f6829698a        ubuntu              "/bin/bash"         21 hours ago        Exited (0) 20 hours ago                           quizzical_ardinghelli
+
+23. Is the tomcat container running? If no, start one.
+
+   ->docker images // displays all existed images check tomcat is pulled r not ,if tomcat is already pulled run tomcat by "docker run tomcat:7.0"
+   ->docker ps     //displays current running containers,able to see tomcat is up and running  
+   ->docker start bfce92f0664a
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        21 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ubuntu@ip-172-31-44-220:~$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+a063f55cc66f        ubuntu              "/usr/bin/top -b"   22 minutes ago      Exited (0) 19 minutes ago                         sample1
+4bfcc1f65561        ubuntu              "/usr/bin/top -b"   28 minutes ago      Exited (0) 26 minutes ago                         topdemo1
+42119280ee18        ubuntu              "/usr/bin"          36 minutes ago      Created                                           topdemo
+55384bf362e8        ubuntu              "/bin/bash"         41 minutes ago      Exited (0) 41 minutes ago                         tes1
+01e3d4f8fcca        ubuntu:latest       "/bin/bash"         About an hour ago   Exited (0) 45 minutes ago                         determined_jackson
+bfce92f0664a        tomcat:7.0          "catalina.sh run"   2 hours ago         Exited (143) 44 minutes ago                       cranky_euler
+c32aa7b88748        tomcat:latest       "catalina.sh run"   2 hours ago         Exited (143) 2 hours ago                          festive_blackburn
+b3177db99279        tomcat:7.0          "catalina.sh run"   2 hours ago         Exited (130) 2 hours ago                          relaxed_almeida
+39ae10fb25ff        hello-world         "/hello"            3 hours ago         Exited (0) 3 hours ago                            musing_einstein
+c65a00385a67        tomcat:7.0          "catalina.sh run"   4 hours ago         Exited (130) 4 hours ago                          goofy_mirzakhani
+593b504f36ae        hello-world         "/hello"            4 hours ago         Exited (0) 3 hours ago                            vigorous_bardeen
+6a1f6829698a        ubuntu              "/bin/bash"         21 hours ago        Exited (0) 20 hours ago                           quizzical_ardinghelli
+ubuntu@ip-172-31-44-220:~$ docker start bfce92f0664a
+bfce92f0664a
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+bfce92f0664a        tomcat:7.0          "catalina.sh run"   2 hours ago         Up 8 seconds        0.0.0.0:8081->8080/tcp   cranky_euler
+ubuntu@ip-172-31-44-220:~$
+
+24. Check the logs, generated by tomcat container(don't forget to make request to tomcat's home page to see the log).
+	
+	->docker ps //check the container is running r not.
+	->docker exec -it c0644fc59fdb bash//go inside the tomcat by using the containerId
+	->ls //to see inside directrys of tomcat
+	->cd logs //cd to logs folder
+	->ls //to see inside existed files 
+	->tail -100 catalina.2019-11-07.log //displays the last 100 lines in the catalina log file
+Ex o/p:
+ubuntu@ip-172-31-44-220:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        22 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+bfce92f0664a        tomcat:7.0          "catalina.sh run"   3 hours ago         Up About an hour    0.0.0.0:8081->8080/tcp   cranky_euler
+ubuntu@ip-172-31-44-220:~$ docker exec -it bfce92f0664a bash
+root@bfce92f0664a:/usr/local/tomcat# ls
+BUILDING.txt  CONTRIBUTING.md  LICENSE  NOTICE  README.md  RELEASE-NOTES  RUNNING.txt  bin  conf  include  lib  logs  native-jni-lib  temp  webapps  work
+root@bfce92f0664a:/usr/local/tomcat# cd logs
+root@bfce92f0664a:/usr/local/tomcat/logs# ls
+catalina.2019-11-08.log  host-manager.2019-11-08.log  localhost.2019-11-08.log  localhost_access_log.2019-11-08.txt  manager.2019-11-08.log
+root@bfce92f0664a:/usr/local/tomcat/logs# tail 100 catalina.2019-11-08.log
+tail: cannot open '100' for reading: No such file or directory
+==> catalina.2019-11-08.log <==
+Nov 08, 2019 8:37:31 AM org.apache.catalina.startup.HostConfig deployDirectory
+INFO: Deploying web application directory /usr/local/tomcat/webapps/docs
+Nov 08, 2019 8:37:31 AM org.apache.catalina.startup.HostConfig deployDirectory
+INFO: Deployment of web application directory /usr/local/tomcat/webapps/docs has finished in 82 ms
+Nov 08, 2019 8:37:32 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-apr-8080"]
+Nov 08, 2019 8:37:32 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["ajp-apr-8009"]
+Nov 08, 2019 8:37:32 AM org.apache.catalina.startup.Catalina start
+INFO: Server startup in 1587 ms
+root@bfce92f0664a:/usr/local/tomcat/logs#
+
+
+25. Check if ubuntu conatiner is running? If no, start one in attached mode to the terminal.
+
+ 
+   docker ps -a | grep ubuntu
+   docker start 2691f695aecc
+   docker attach sample
+
+ubuntu@ip-172-31-44-220:~$ docker ps -a | grep ubuntu
+bc61627f6819        ubuntu              "/usr/bin/top -b"   About an hour ago   Up 21 minutes                                        sample3
+61e4f17d88cd        ubuntu:latest       "/bin/bash"         About an hour ago   Exited (0) About an hour ago                         pensive_lalande
+947fa9d91b23        ubuntu:latest       "/bin/bash"         About an hour ago   Exited (0) About an hour ago                         keen_poincare
+21f7d10bde69        ubuntu              "/bin/bash"         About an hour ago   Up 14 minutes                                        sample
+eb37f4395882        ubuntu              "/bin/bash"         About an hour ago   Exited (137) About an hour ago                       test
+f470bbc2cb4c        ubuntu              "/usr/bin/top -b"   2 hours ago         Exited (0) 2 hours ago                               test1
+fc0fa8d1072d        ubuntu              "/usr/bin/top -b"   2 hours ago         Exited (137) About an hour ago                       tets1
+bcd0b82243b2        ubuntu              "bin/bash"          3 days ago          Exited (0) 3 days ago                                sample2
+178d1e9caa98        ubuntu              "/bin/bash"         3 days ago          Exited (127) 3 days ago                              cranky_golick
+a063f55cc66f        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                                sample1
+4bfcc1f65561        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                                topdemo1
+42119280ee18        ubuntu              "/usr/bin"          3 days ago          Created                                              topdemo
+55384bf362e8        ubuntu              "/bin/bash"         3 days ago          Exited (0) 3 days ago                                tes1
+01e3d4f8fcca        ubuntu:latest       "/bin/bash"         3 days ago          Exited (0) 3 days ago                                determined_jackson
+6a1f6829698a        ubuntu              "/bin/bash"         4 days ago          Exited (0) 4 days ago                                quizzical_ardinghelli
+ubuntu@ip-172-31-44-220:~$ dock attach 21f7d10bde69
+
+ubuntu@ip-172-31-44-220:~$ docker attach 21f7d10bde69
+root@21f7d10bde69:/#
+
+ 
+26. Login as root user in ubuntu container
+    
+	sudo su  //ubuntu ->root
+	
+	Ex o/p:
+	ubuntu@ip-172-31-44-220:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        23 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+178d1e9caa98        ubuntu              "/bin/bash"         6 minutes ago       Up 6 minutes                                 cranky_golick
+bfce92f0664a        tomcat:7.0          "catalina.sh run"   4 hours ago         Up 2 hours          0.0.0.0:8081->8080/tcp   cranky_euler
+ubuntu@ip-172-31-44-220:~$ docker exec -it 178d1e9caa98 bin/bash
+root@178d1e9caa98:/# whoami
+root
+
+  or
+ 
+Ex o/p 2:
+
+ubuntu@ip-172-31-44-220:~$ whoami
+ubuntu
+ubuntu@ip-172-31-44-220:~$ sudo su
+root@ip-172-31-44-220:/home/ubuntu# whoami
+root
+ 
+---- running ubuntu container  goes into inside container(root user)-----
+ubuntu@ip-172-31-44-220:~$ docker exec -it 21f7d10bde69 bash
+    
+	or 
+Ex:
+
+ubuntu@ip-172-31-44-220:~$ docker attach 21f7d10bde69
+root@21f7d10bde69:/#
+
+	
+27. Create a file with any name in root directory
+    
+root@21f7d10bde69:/# touch am.txt
+root@21f7d10bde69:/# ls
+am.txt  apple.txt  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@21f7d10bde69:/#
+
+28. Install software of your choice in ubuntu container using "apt-get install"
+
+    ->docker ps //listed running containers. take ubuntu container id(568e8eca4a42)
+    ->docker exec -it 568e8eca4a42 bash //went inside the ubuntu container
+	->apt-get install git  //in root
+
+Ex o/p:
+
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+21f7d10bde69        ubuntu              "/bin/bash"         About an hour ago   Up About an hour                        sample
+
+
+root@21f7d10bde69:/# apt-get install git
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+E: Unable to locate package git
+root@21f7d10bde69:/#
+
+29. Now exit the ubuntu shell, are you back to your host machine, if not, come back to the host machine.
+    
+	exit
+	
+	Ex o/p:
+root@21f7d10bde69:/# exit
+exit
+ubuntu@ip-172-31-44-220:~$
+
+
+	
+30. Check if the ubuntu container is running.
+
+ Ex:docker ps -a |grep ubuntu
+  or 
+ ubuntu@ip-172-31-44-220:~$ docker ps -a |grep 21f7d10bde69
+21f7d10bde69        ubuntu              "/bin/bash"         2 hours ago         Exited (100) 2 minutes ago                         sample
+ubuntu@ip-172-31-44-220:~$
+
+
+31. Create a new ubuntu container out of the same image as that previous container in attached mode.
+
+i/p:
+docker run -d --name sample4 ubuntu /bin/bash
+docker ps
+docker attach sample3
+
+o/p:
+
+ubuntu@ip-172-31-44-220:~$ docker run -d --name sample4 ubuntu /usr/bin/top -b
+ea680a81429045621f541bb7b5021cc6efa6440605a5830af590f67503ea29ca
+ubuntu@ip-172-31-44-220:~$ docker ps -a| grep ubuntu
+ea680a814290        ubuntu              "/usr/bin/top -b"   18 seconds ago      Up 17 seconds                                     sample4
+bc61627f6819        ubuntu              "/usr/bin/top -b"   About an hour ago   Up 40 minutes                                     sample3
+61e4f17d88cd        ubuntu:latest       "/bin/bash"         2 hours ago         Exited (0) 2 hours ago                            pensive_lalande
+947fa9d91b23        ubuntu:latest       "/bin/bash"         2 hours ago         Exited (0) 2 hours ago                            keen_poincare
+21f7d10bde69        ubuntu              "/bin/bash"         2 hours ago         Exited (100) 12 minutes ago                       sample
+eb37f4395882        ubuntu              "/bin/bash"         2 hours ago         Exited (137) 2 hours ago                          test
+f470bbc2cb4c        ubuntu              "/usr/bin/top -b"   2 hours ago         Exited (0) 2 hours ago                            test1
+fc0fa8d1072d        ubuntu              "/usr/bin/top -b"   2 hours ago         Exited (137) 2 hours ago                          tets1
+bcd0b82243b2        ubuntu              "bin/bash"          3 days ago          Exited (0) 3 days ago                             sample2
+178d1e9caa98        ubuntu              "/bin/bash"         3 days ago          Exited (127) 3 days ago                           cranky_golick
+a063f55cc66f        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                             sample1
+4bfcc1f65561        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                             topdemo1
+42119280ee18        ubuntu              "/usr/bin"          3 days ago          Created                                           topdemo
+55384bf362e8        ubuntu              "/bin/bash"         3 days ago          Exited (0) 3 days ago                             tes1
+01e3d4f8fcca        ubuntu:latest       "/bin/bash"         3 days ago          Exited (0) 3 days ago                             determined_jackson
+6a1f6829698a        ubuntu              "/bin/bash"         4 days ago          Exited (0) 4 days ago                             quizzical_ardinghelli
+ubuntu@ip-172-31-44-220:~$ docker attach ea680a814290
+
+
+top - 05:31:40 up  2:09,  0 users,  load average: 0.02, 0.05, 0.01
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  1.3 us,  0.3 sy,  0.0 ni, 98.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   128040 free,   445988 used,   433528 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   413552 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3104   2756 R  0.0  0.3   0:00.28 top
+
+top - 05:31:43 up  2:09,  0 users,  load average: 0.02, 0.05, 0.01
+Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  1007556 total,   128040 free,   445988 used,   433528 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.   413560 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   36484   3104   2756 R  0.0  0.3   0:00.28 top
+
+top -
+
+32. Login as a root user (login to the newly created container using container id)
+ in aws:
+->by default will be in ubuntu user
+->if we use  sudo su will go to root user.
+Ex:
+ubuntu@ip-172-31-44-220:~$ whoami
+ubuntu
+ubuntu@ip-172-31-44-220:~$ sudo su
+root@ip-172-31-44-220:/home/ubuntu# whoami
+root
+
+->by using docker exec -it containerId command we can go inside of root
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+bc61627f6819        ubuntu              "/usr/bin/top -b"   About an hour ago   Up About an hour                        sample3
+
+ubuntu@ip-172-31-44-220:~$ docker exec -it bc61627f6819 /bin/bash
+root@bc61627f6819:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@bc61627f6819:/#
+
+ 
+33. Check if you can see the file created in previous container, you will not see the file as well as software that you installed in the previous container. Now kill this Container.
+ No
+ 
+ Ex:
+ ubuntu@ip-172-31-44-220:~$ docker exec -it bc61627f6819 /bin/bash
+root@bc61627f6819:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@bc61627f6819:/#
+root@bc61627f6819:/#
+root@bc61627f6819:/# git --version
+bash: git: command not found
+root@bc61627f6819:/#
+
+ubuntu@ip-172-31-44-220:~$ docker container kill ea680a814290
+ea680a814290
+ubuntu@ip-172-31-44-220:~$ docker ps -a |grep ubuntu
+ea680a814290        ubuntu              "/usr/bin/top -b"   22 minutes ago      Exited (137) 4 seconds ago                        sample4
+
+
+34. Do you have the previous ubuntu container where you created the file and installed the software? If no reapeat step 25 to 29.
+yes.
+
+35. Create an Image out of the existing container.
+ubuntu@ip-172-31-44-220:~$ docker ps -a | grep ubuntu
+ea680a814290        ubuntu              "/usr/bin/top -b"   34 minutes ago      Exited (137) 11 minutes ago                          sample4
+bc61627f6819        ubuntu              "/usr/bin/top -b"   2 hours ago         Exited (137) 17 minutes ago                          sample3
+61e4f17d88cd        ubuntu:latest       "/bin/bash"         2 hours ago         Exited (0) 2 hours ago                               pensive_lalande
+947fa9d91b23        ubuntu:latest       "/bin/bash"         2 hours ago         Exited (0) 2 hours ago                               keen_poincare
+21f7d10bde69        ubuntu              "/bin/bash"         2 hours ago         Exited (100) About an hour ago                       sample
+eb37f4395882        ubuntu              "/bin/bash"         2 hours ago         Exited (137) 2 hours ago                             test
+f470bbc2cb4c        ubuntu              "/usr/bin/top -b"   3 hours ago         Exited (0) 3 hours ago                               test1
+fc0fa8d1072d        ubuntu              "/usr/bin/top -b"   3 hours ago         Exited (137) 2 hours ago                             tets1
+bcd0b82243b2        ubuntu              "bin/bash"          3 days ago          Exited (0) 3 days ago                                sample2
+178d1e9caa98        ubuntu              "/bin/bash"         3 days ago          Exited (127) 3 days ago                              cranky_golick
+a063f55cc66f        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                                sample1
+4bfcc1f65561        ubuntu              "/usr/bin/top -b"   3 days ago          Exited (0) 3 days ago                                topdemo1
+42119280ee18        ubuntu              "/usr/bin"          3 days ago          Created                                              topdemo
+55384bf362e8        ubuntu              "/bin/bash"         3 days ago          Exited (0) 3 days ago                                tes1
+01e3d4f8fcca        ubuntu:latest       "/bin/bash"         3 days ago          Exited (0) 3 days ago                                determined_jackson
+6a1f6829698a        ubuntu              "/bin/bash"         4 days ago          Exited (0) 4 days ago                                quizzical_ardinghelli
+
+
+ubuntu@ip-172-31-44-220:~$ docker commit fc0fa8d1072d testimage:version1
+sha256:77433e7efe7175c6de3d913f6f36edbdf19512ca5f4fa0a7ce64a876c3787b33
+
+ubuntu@ip-172-31-44-220:~$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           version1            77433e7efe71        8 seconds ago       64.2MB
+mycontainer         version1            5f00bb8d8339        42 minutes ago      64.2MB
+testimage           latest              a6fb2b49321d        4 days ago          64.2MB
+ubuntu              latest              775349758637        11 days ago         64.2MB
+tomcat              7.0                 e3a393545a10        3 weeks ago         506MB
+tomcat              latest              882487b8be1d        3 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+
+36. Now Create a Container out of this image and login into it to see if you can see the file and software installed by you in the previous container.
+
+ubuntu@ip-172-31-44-220:~$ docker create 77433e7efe71
+8db118377f3728db850275db85e1eae4b772acfadc943c11bda41b7cb02d0ba5
+ubuntu@ip-172-31-44-220:~$ docker start 8db118377f3728db850275db85e1eae4b772acfadc943c11bda41b7cb02d0ba5
+8db118377f3728db850275db85e1eae4b772acfadc943c11bda41b7cb02d0ba5
+ubuntu@ip-172-31-44-220:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+8db118377f37        77433e7efe71        "/usr/bin/top -b"   About a minute ago   Up 5 seconds                            gifted_panini
+bc61627f6819        ubuntu              "/usr/bin/top -b"   3 hours ago          Up 15 minutes                           sample3
+fc0fa8d1072d        ubuntu              "/usr/bin/top -b"   3 hours ago          Up 6 minutes                            tets1
+
+ubuntu@ip-172-31-44-220:~$ docker exec -it 8db118377f37 /bin/bash
+root@8db118377f37:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  testfile  tmp  usr  var
+root@8db118377f37:/#
+
+
+37. Do you have running tomcat container? If yes, Stop it and kill all tomcat container.
+
+No
+docker kill bfce92f0664a  //tomcat container id
+
+38. Create an index.html file with following code in it:-
+Now, Start a tomcat container in such a way that on hitting its URL for home page it should show the above html page.
+
+39. type below command:-
+	docker images --help
+Now, try to run command that proves the concept of following three options:-
+1. -a -->listout all existed images
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker images -a
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        18 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+
+2. -f -->(-f or --filter) is use to filter particular type based on dangling=boolean,true/false  //DOUBT with --filter
+          display untagged images 
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker images -f "dangling=false"        //existed stopped containers
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+testimage           latest              a6fb2b49321d        18 hours ago        64.2MB
+ubuntu              latest              775349758637        7 days ago          64.2MB
+tomcat              7.0                 e3a393545a10        2 weeks ago         506MB
+tomcat              latest              882487b8be1d        2 weeks ago         507MB
+hello-world         latest              fce289e99eb9        10 months ago       1.84kB
+tomcat              8.0                 ef6a7c98d192        14 months ago       356MB
+
+ubuntu@ip-172-31-44-220:~$ docker images -f "dangling=true"
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+
+
+ubuntu@ip-172-31-44-220:~$ docker images -f "dangling=boolean"  //doubt have to ask
+Error response from daemon: Invalid filter 'dangling=[boolean]'
+
+
+3. -q ->display only ID of the image or container
+ Ex:
+ ubuntu@ip-172-31-44-220:~$ docker images -q
+a6fb2b49321d
+775349758637
+e3a393545a10
+882487b8be1d
+fce289e99eb9
+ef6a7c98d192
+
+ubuntu@ip-172-31-44-220:~$ docker container ls -a -q
+c65a00385a67
+593b504f36ae
+6a1f6829698a
+
+
+write atleast 1 command using each option above and prove their concepts as described in the --help.
+
+
+40. type below command:-
+	docker ps --help
+Now, try to run command that proves the concept of following six options:-
+
+1. -a  // -a --all shows all existed images(including existed,created,up...etc)[Show all containers (default shows just running)]
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                        PORTS               NAMES
+c65a00385a67        tomcat:7.0          "catalina.sh run"   44 minutes ago      Exited (130) 42 minutes ago                       goofy_mirzakhani
+593b504f36ae        hello-world         "/hello"            About an hour ago   Created                                           vigorous_bardeen
+6a1f6829698a        ubuntu              "/bin/bash"         18 hours ago        Exited (0) 17 hours ago                           quizzical_ardinghelli
+
+2. -f   ->//-f, --filter filter   Filter output based on conditions provided
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -a -f "name=musing_einstein"
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+39ae10fb25ff        hello-world         "/hello"            5 minutes ago       Exited (0) 5 minutes ago                       musing_einstein
+
+ubuntu@ip-172-31-44-220:~$ docker ps -a --filter "name=musing_einstein"
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+39ae10fb25ff        hello-world         "/hello"            5 minutes ago       Exited (0) 5 minutes ago                       musing_einstein
+ubuntu@ip-172-31-44-220:~$
+
+3. -q   -> -q, --quiet           Only display numeric IDs
+
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -a -q
+39ae10fb25ff
+c65a00385a67
+593b504f36ae
+6a1f6829698a
+
+4. -n  -> -n, --last int        Show n last created containers (includes all states) (default -1)
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -n=3
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                           PORTS               NAMES
+39ae10fb25ff        hello-world         "/hello"            11 minutes ago      Exited (0) 11 minutes ago                            musing_einstein
+c65a00385a67        tomcat:7.0          "catalina.sh run"   About an hour ago   Exited (130) About an hour ago                       goofy_mirzakhani
+593b504f36ae        hello-world         "/hello"            2 hours ago         Exited (0) 13 minutes ago                            vigorous_bardeen
+
+5. -l  -> -l, --latest          Show the latest created container (includes all states)
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+39ae10fb25ff        hello-world         "/hello"            10 minutes ago      Exited (0) 10 minutes ago                       musing_einstein
+
+
+6. -s  ->-s, --size            Display total file sizes
+Ex:
+ubuntu@ip-172-31-44-220:~$ docker ps -a -s
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                           PORTS               NAMES                   SIZE
+39ae10fb25ff        hello-world         "/hello"            13 minutes ago      Exited (0) 13 minutes ago                            musing_einstein         0B (virtual 1.84kB)
+c65a00385a67        tomcat:7.0          "catalina.sh run"   About an hour ago   Exited (130) About an hour ago                       goofy_mirzakhani        7.13kB (virtual 506MB)
+593b504f36ae        hello-world         "/hello"            2 hours ago         Exited (0) 14 minutes ago                            vigorous_bardeen        0B (virtual 1.84kB)
+6a1f6829698a        ubuntu              "/bin/bash"         19 hours ago        Exited (0) 17 hours ago                              quizzical_ardinghelli   0B (virtual 64.2MB)
+
+
