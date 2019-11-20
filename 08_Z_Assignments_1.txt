@@ -1,0 +1,274 @@
+1.Your company is ready to start using Docker on some of their servers. In order to get started,
+they want you to set up and configure Docker CE on a server that has already been set up.
+You will need to make sure that the server meets the following specifications:
+
+Docker CE is installed and running on the server.
+Use Docker CE version 5:18.09.5~3-0~ubuntu-bionic.
+Any non-root user has permission to run docker commands.
+The default logging driver is set to syslog.
+
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+
+Good luck!
+
+***************************************************************************************************************************************
+
+                                                       ON AWS UBUNTU INSTANCE
+
+1.sudo apt-get update //update the package database
+
+root@ip-172-31-90-251:/home/ubuntu# sudo apt-get update
+Hit:1 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic InRelease
+Get:2 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]
+Get:3 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic-backports InRelease [74.6 kB]
+Get:4 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]
+.
+.
+Get:28 http://security.ubuntu.com/ubuntu bionic-security/multiverse Translation-en [2568 B]
+Fetched 18.1 MB in 4s (4746 kB/s)
+Reading package lists... Done
+
+2.curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - //add the GPG key for the official Docker repository
+
+root@ip-172-31-90-251:/home/ubuntu# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+OK
+
+NOTE:
+is a tool for secure communication that was created by Werner Koch as Free Software under the GNU Project. 
+This means anyone can send you a secure message if they have a copy of your public key
+
+3.Then add the Docker repository to APT sources
+
+root@ip-172-31-90-251:/home/ubuntu# sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+Get:1 https://download.docker.com/linux/ubuntu bionic InRelease [64.4 kB]
+Hit:2 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic InRelease
+Hit:3 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic-updates InRelease
+Hit:4 http://us-east-1.ec2.archive.ubuntu.com/ubuntu bionic-backports InRelease
+Get:5 https://download.docker.com/linux/ubuntu bionic/stable amd64 Packages [9852 B]
+Hit:6 http://security.ubuntu.com/ubuntu bionic-security InRelease
+Fetched 74.3 kB in 0s (153 kB/s)
+Reading package lists... Done
+
+4.sudo apt-get install -y docker-ce //install Docker CE
+
+root@ip-172-31-90-251:/home/ubuntu# sudo apt-get install -y docker-ce
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following additional packages will be installed:
+  aufs-tools cgroupfs-mount containerd.io docker-ce-cli libltdl7 pigz
+The following NEW packages will be installed:
+  aufs-tools cgroupfs-mount containerd.io docker-ce docker-ce-cli libltdl7 pigz
+0 upgraded, 7 newly installed, 0 to remove and 47 not upgraded.
+Need to get 85.5 MB of archives.
+.
+.
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+Processing triggers for ureadahead (0.100.0-21) ...
+
+5.docker --version //Doing sanity check by checking Docker version
+
+root@ip-172-31-90-251:/home/ubuntu# docker --version
+Docker version 19.03.5, build 633a0ea838
+
+6.sudo usermod -aG docker ${USER} //adding the current user to the docker group.
+
+root@ip-172-31-90-251:/home/ubuntu# sudo usermod -aG docker ${USER}
+
+7.exit //exiting the current user to update for recent changes .
+
+root@ip-172-31-90-251:/home/ubuntu# exit
+exit
+ubuntu@ip-172-31-90-251:~$ exit
+logout
+Connection to ec2-3-88-178-192.compute-1.amazonaws.com closed.
+
+8.Now i ssh into git bash  & i tryed to login as a ubuntu user ,it given error because ubuntu user not added to docker group. 
+
+ubuntu@ip-172-31-90-251:~$ docker info
+Client:
+ Debug Mode: false
+
+Server:
+ERROR: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get http://%2Fvar%2Frun%2Fdocker.sock/v1.40/info: dial unix /var/run/docker.sock: connect: permission denied
+errors pretty printing info
+
+9.Now i tryed to login as root user ,now i can able to see total docker info,becuse that root user is alredy added to docker group by using usermod. 
+
+ docker info
+Client:
+ Debug Mode: false
+
+Server:
+ Containers: 0
+  Running: 0
+  Paused: 0
+  Stopped: 0
+ Images: 0
+ Server Version: 19.03.5
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+ Logging Driver: json-file   //before adding syslog
+ Cgroup Driver: cgroupfs
+
+10.go to /etc/docker   folder check wether daemon.json is existed or not,if not craete daemon.joson filewith following data.
+{
+  "log-driver": "syslog",
+  "log-opts": {
+    "syslog-address": "udp://1.2.3.4:1111"
+  }
+}
+
+Ex:
+In the current root user i have went to /etc/docker folder ,i found only key.json &daemon.json is not there.
+touch daemon.json // this will create daemon.json file 
+ls                // checked existed files.
+vi daemon.json    //went inside daemon.json file then added 
+											{
+						  "log-driver": "syslog",
+						  "log-opts": {
+							"syslog-address": "udp://1.2.3.4:1111"
+						  }
+						}
+
+After adding syslog:
+root@ip-172-31-90-251:/etc/docker# systemctl restart docker
+root@ip-172-31-90-251:/etc/docker# docker info
+Client:
+ Debug Mode: false
+
+Server:
+ Containers: 0
+  Running: 0
+  Paused: 0
+  Stopped: 0
+ Images: 0
+ Server Version: 19.03.5
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+ Logging Driver: syslog  //after syslog
+ Cgroup Driver: cgroupfs
+ 
+Note:									
+check wether syslog is existed under path   /var/log  
+if existed check is there any data existed inside syslog r not.
+but /var/log/syslog is the default location of syslog file.
+
+
+After Setting syslog:
+
+ --> dmesg  //  fetches all the messages from the kernel’s buffer
+
+root@ip-172-31-90-251:/etc/docker# dmesg
+[    0.000000] Linux version 4.15.0-1051-aws (buildd@lgw01-amd64-005) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)) #53-Ubuntu SMP Wed Sep 18 13:35:53 UTC 2019 (Ubuntu 4.15.0-1051.53-aws 4.15.18)
+[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-4.15.0-1051-aws root=LABEL=cloudimg-rootfs ro console=tty1 console=ttyS0 nvme_core.io_timeout=4294967295
+[    0.000000] KERNEL supported cpus:
+[    0.000000]   Intel GenuineIntel
+[    0.000000]   AMD AuthenticAMD
+[    0.000000]   Centaur CentaurHauls
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+
+->cat /var/log/syslog  //going inside of the syslog file it will display total data of the syslog on console. 
+
+root@ip-172-31-90-251:/etc/docker# cat /var/log/syslog
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Linux version 4.15.0-1051-aws (buildd@lgw01-amd64-005) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)) #53-Ubuntu SMP Wed Sep 18 13:35:53 UTC 2019 (Ubuntu 4.15.0-1051.53-aws 4.15.18)
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-4.15.0-1051-aws root=LABEL=cloudimg-rootfs ro console=tty1 console=ttyS0 nvme_core.io_timeout=4294967295
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] KERNEL supported cpus:
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   Intel GenuineIntel
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   AMD AuthenticAMD
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   Centaur CentaurHauls
+ 
+ or else
+ 
+->cd /var/log    //go to this folder /var/log
+
+root@ip-172-31-90-251:/etc/docker# cd /var/log 
+
+->ls             //do ls to see existed files check for syslog file
+root@ip-172-31-90-251:/var/log# ls
+amazon  auth.log  cloud-init-output.log  dist-upgrade  journal   landscape  lxd     tallylog             wtmp
+apt     btmp      cloud-init.log         dpkg.log      kern.log  lastlog    syslog  unattended-upgrades
+
+->vi syslog      //go inside of syslog
+
+root@ip-172-31-90-251:/var/log# vi syslog
+
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Linux version 4.15.0-1051-aws (buildd@lgw01-amd64-005) (gcc version 7.4.0 (Ubuntu 7.4.0-1ubuntu1~18.04.1)) #53-Ubuntu SMP Wed Sep 18 13:35:53 UTC 2019 (Ubuntu 4.15.0-1051.53-aws 4.15.18)
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-4.15.0-1051-aws root=LABEL=cloudimg-rootfs ro console=tty1 console=ttyS0 nvme_core.io_timeout=4294967295
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] KERNEL supported cpus:
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   Intel GenuineIntel
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   AMD AuthenticAMD
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   Centaur CentaurHauls
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 bytes, using 'standard' format.
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] e820: BIOS-provided physical RAM map:
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009dfff] usable
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] BIOS-e820: [mem 0x000000000009e000-0x000000000009ffff] reserved
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] BIOS-e820: [mem 0x00000000000e0000-0x00000000000fffff] reserved
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000003fffffff] usable
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] BIOS-e820: [mem 0x00000000fc000000-0x00000000ffffffff] reserved
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] NX (Execute Disable) protection: active
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] SMBIOS 2.7 present.
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] DMI: Xen HVM domU, BIOS 4.2.amazon 08/24/2006
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Hypervisor detected: Xen HVM
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Xen version 4.2.
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Xen Platform PCI: I/O protocol version 1
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Netfront and the Xen platform PCI driver have been compiled for this kernel: unplug emulated NICs.
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] Blkfront and the Xen platform PCI driver have been compiled for this kernel: unplug emulated disks.
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] You might have to change the root device
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] from /dev/hd[a-d] to /dev/xvd[a-d]
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] in your root= kernel command line option
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] HVMOP_pagetable_dying not supported
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] e820: update [mem 0x00000000-0x00000fff] usable ==> reserved
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] e820: remove [mem 0x000a0000-0x000fffff] usable
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] e820: last_pfn = 0x40000 max_arch_pfn = 0x400000000
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] MTRR default type: write-back
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] MTRR fixed ranges enabled:
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   00000-9FFFF write-back
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   A0000-BFFFF write-combining
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   C0000-FFFFF write-back
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000] MTRR variable ranges enabled:
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   0 base 0000F0000000 mask 3FFFF8000000 uncachable
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   1 base 0000F8000000 mask 3FFFFC000000 uncachable
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   2 disabled
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   3 disabled
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   4 disabled
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   5 disabled
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   6 disabled
+Nov 16 17:04:47 ip-172-31-90-251 kernel: [    0.000000]   7 disabled
+"syslog" 1090L, 117347C   
+
+
+2.On Linux os:
+
+->sudo yum update -y                        //updating
+->sudo amazon-linux-extras install docker   //installing docker 
+->sudo service docker start                 //starting docker
+->sudo usermod -a -G docker ec2-user        //adding ec2 user to the docker grop so that we can run docker commands without using sudo
+->go to /etc/docker   folder check wether daemon.json is existed or not,if not craete daemon.joson filewith following data.
+{
+  "log-driver": "syslog"
+}
+         
+
+Ex:
+[ec2-user@ip-172-31-36-248 docker]$ ls
+daemon.json  daemon.json  key.json
+[ec2-user@ip-172-31-36-248 docker]$ docker info --format '{{.LoggingDriver}}'
+json-file
+		 
+Refrence Notes:
+https://medium.com/@cjus/installing-docker-ce-on-an-aws-ec2-instance-running-ubuntu-16-04-f42fe7e80869
+https://vitux.com/view-system-log-files-ubuntu/ //under view Log Files Through the Ubuntu Terminal in aws session.											  

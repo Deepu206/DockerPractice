@@ -1,0 +1,233 @@
+Your supermarket company has a simple web service built on nginx that serves a static list of fresh fruit available in their stores.
+They want to run this service as a Docker container in their new swarm environment, but first they need you to build a Docker image for 
+this service.On this repo (https://github.com/satyensingh/full-docker-training-16-Z-Assignment1.git), 
+you will find the files needed to create the image. Create a Dockerfile to define the image according to the provided specifications, then test the image by running a container in detached mode and verifying that you can access the fresh fruit data from the application.
+
+The image should meet the following specifications:
+
+1. Use nginx tag 1.15.8 as the base image.
+2. Add the static fresh fruit data to the image so that it will be served by the nginx server. 
+   The data file is located on the server at static/fruit.json under the project directory. //is located in git hub
+   Add this file to the image at the location /usr/share/nginx/html/fruit.json.             // WORKDIR  
+3. Add the nginx configuration file. This file is located on the server in the project directory and is called nginx.conf.
+   Add this file to the image at /etc/nginx/nginx.conf.
+4. The image should expose port 80.
+5. Use the following as the default command: nginx -g daemon off;.
+6. Build the image with the tag fruit-list:1.0.0
+
+Once you have built the image you should be able to test it by running it as a container:
+
+docker run --name fruit-list -d -p 8080:80 fruit-list:1.0.0
+
+
+Verify that the container serves the required data by making a request to it on port 8080. If everything is set up correctly, you should get a JSON list of fruits.
+
+curl localhost:8080
+
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+
+Good luck!
+----------------------------
+->mkdir project //create project dir
+root@ip-172-31-90-251:/home/ubuntu# mkdir project
+
+->cd project    //change into project dir
+root@ip-172-31-90-251:/home/ubuntu# cd project
+
+->mkdir static //create static dir
+root@ip-172-31-90-251:/home/ubuntu/project# mkdir static
+
+->cd into static dir
+root@ip-172-31-90-251:/home/ubuntu/project# cd static
+
+
+root@ip-172-31-90-251:/home/ubuntu/project/static# pwd
+/home/ubuntu/project/static
+
+->vi fruit.json then add the data as shown below.
+root@ip-172-31-90-251:/home/ubuntu/project/static# vi fruit.json
+{
+  "description": "A list of fruits.",
+  "fruits": [
+    "apple",
+    "apricot",
+    "avocado",
+    "banana",
+    "bell pepper",
+    "bilberry",
+	"ugli fruit",
+    "watermelon"
+  ]
+}
+
+root@ip-172-31-90-251:/home/ubuntu/project/static# cd ..
+root@ip-172-31-90-251:/home/ubuntu/project# ls
+static
+root@ip-172-31-90-251:/home/ubuntu/project# vi nginx.conf
+root@ip-172-31-90-251:/home/ubuntu/project# ls
+nginx.conf  static
+
+->the above docker file has data 
+ 
+FROM nginx:1.15.8
+      RUN apt-get update
+      WORKDIR /usr/share/nginx/html
+      ADD ./project/static/fruit.json ./
+      WORKDIR /etc/nginx
+      ADD ./project/nginx.conf ./
+      EXPOSE 80 
+	  
+->docker build -t fruit-list:1.0.0 . //build image 
+
+root@ip-172-31-90-251:/home/ubuntu/project# docker build -t fruit-list:1.0.0 .
+unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /home/ubuntu/project/Dockerfile: no such file or directory
+root@ip-172-31-90-251:/home/ubuntu/project#
+root@ip-172-31-90-251:/home/ubuntu/project# docker build -t fruit-list:1.0.0 .
+unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /home/ubuntu/project/Dockerfile: no such file or directory
+root@ip-172-31-90-251:/home/ubuntu/project# cd ..
+root@ip-172-31-90-251:/home/ubuntu# ls
+Dockerfile  customImagesDir  docker  fruits.json  nginx.conf  project  registry  registry1  static	  
+root@ip-172-31-90-251:/home/ubuntu# docker build -t fruit-list:1.0.0 .
+Sending build context to Docker daemon  66.56kB
+Step 1/7 : FROM nginx:1.15.8
+ ---> f09fe80eb0e7
+Step 2/7 : RUN apt-get update
+ ---> Running in 7ffe9192236f
+Get:1 http://security-cdn.debian.org/debian-security stretch/updates InRelease [94.3 kB]
+Ign:2 http://cdn-fastly.deb.debian.org/debian stretch InRelease
+Get:3 http://security-cdn.debian.org/debian-security stretch/updates/main amd64 Packages [508 kB]
+Get:4 http://cdn-fastly.deb.debian.org/debian stretch-updates InRelease [91.0 kB]
+Get:5 http://cdn-fastly.deb.debian.org/debian stretch Release [118 kB]
+Get:6 http://cdn-fastly.deb.debian.org/debian stretch Release.gpg [2365 B]
+Get:7 http://cdn-fastly.deb.debian.org/debian stretch-updates/main amd64 Packages [27.9 kB]
+Get:8 http://cdn-fastly.deb.debian.org/debian stretch/main amd64 Packages [7086 kB]
+Fetched 7927 kB in 1s (4464 kB/s)
+Reading package lists...
+Removing intermediate container 7ffe9192236f
+ ---> e1fd4ac3a352
+Step 3/7 : WORKDIR /usr/share/nginx/html
+ ---> Running in ae3267191639
+Removing intermediate container ae3267191639
+ ---> 85b6ef204a3b
+Step 4/7 : ADD ./project/static/fruit.json ./
+ ---> d8ec759dad8c
+Step 5/7 : WORKDIR /etc/nginx
+ ---> Running in d844d76ef1fe
+Removing intermediate container d844d76ef1fe
+ ---> 10f7b07bd91b
+Step 6/7 : ADD ./project/nginx.conf ./
+ ---> 2f2a900d752a
+Step 7/7 : EXPOSE 80
+ ---> Running in 5cf3a0a1d5e0
+Removing intermediate container 5cf3a0a1d5e0
+ ---> ef8ec2a12393
+Successfully built ef8ec2a12393
+Successfully tagged fruit-list:1.0.0
+
+->docker images
+
+root@ip-172-31-90-251:/home/ubuntu# docker images
+REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE
+fruit-list                              1.0.0               ef8ec2a12393        7 seconds ago       126MB
+<none>                                  <none>              c9da11c3eab1        4 hours ago         109MB
+<none>                                  <none>              b7f1972b1529        16 hours ago        142MB
+<none>                                  <none>              56aedc8d7aaf        18 hours ago        142MB
+<none>                                  <none>              d153c43e3c5e        18 hours ago        109MB
+<none>                                  <none>              5aa06d11b792        24 hours ago        106MB
+	  
+
+-root@ip-172-31-90-251:/home/ubuntu/project# cd ..
+root@ip-172-31-90-251:/home/ubuntu# ls
+Dockerfile  customImagesDir  docker  fruits.json  nginx.conf  project  registry  registry1  static
+root@ip-172-31-90-251:/home/ubuntu# docker run --name fruit-list -d -p 8080:80 fruit-list:1.0.0
+docker: Error response from daemon: Conflict. The container name "/fruit-list" is already in use by container "f1640fd2d786dea0734f338213feaaca9663d10efa1bdf6f7bb5fe566d1cc072". You have to remove (or rename) that container to be able to reuse that name.
+See 'docker run --help'.
+root@ip-172-31-90-251:/home/ubuntu# curl localhost:8080
+{
+  "description": "A list of fruits.",
+  "fruits": [
+    "apple",
+    "apricot",
+    "avocado",
+    "banana",
+    "bell pepper",
+    "bilberry",
+    "blackberry",
+    "blackcurrant",
+    "blood orange",
+    "blueberry",
+    "boysenberry",
+    "breadfruit",
+    "canary melon",
+    "cantaloupe",
+    "cherimoya",
+    "cherry",
+    "chili pepper",
+    "clementine",
+    "cloudberry",
+    "coconut",
+    "cranberry",
+    "cucumber",
+    "currant",
+    "damson",
+    "date",
+    "dragonfruit",
+    "durian",
+    "eggplant",
+    "elderberry",
+    "feijoa",
+    "fig",
+    "goji berry",
+    "gooseberry",
+    "grape",
+    "grapefruit",
+    "guava",
+    "honeydew",
+    "huckleberry",
+    "jackfruit",
+    "jambul",
+    "jujube",
+    "kiwi fruit",
+    "kumquat",
+    "lemon",
+    "lime",
+    "loquat",
+    "lychee",
+    "mandarine",
+    "mango",
+    "mulberry",
+    "nectarine",
+    "nut",
+    "olive",
+    "orange",
+    "pamelo",
+    "papaya",
+    "passionfruit",
+    "peach",
+    "pear",
+    "persimmon",
+    "physalis",
+    "pineapple",
+    "plum",
+    "pomegranate",
+    "pomelo",
+    "purple mangosteen",
+    "quince",
+    "raisin",
+    "rambutan",
+    "raspberry",
+    "redcurrant",
+    "rock melon",
+    "salal berry",
+    "satsuma",
+    "star fruit",
+    "strawberry",
+    "tamarillo",
+    "tangerine",
+    "tomato",
+    "ugli fruit",
+    "watermelon"
+  ]
+}

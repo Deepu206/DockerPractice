@@ -1,0 +1,150 @@
+2.Your company is ready to move forward with using Docker to run their applications. 
+However, they have some complex container apps that can take advantage of the cluster management and
+orchestration features of Docker swarm. You have been asked to stand up a simple Docker swarm cluster 
+to be used for some initial testing. A set of servers has already been provisioned for this purpose. 
+The swarm cluster should meet the following criteria:
+
+One Swarm manager.
+Two worker nodes.
+All nodes should use Docker CE version 5:18.09.5~3-0~ubuntu-bionic.
+Both worker nodes should be joined to the cluster.
+Any non-root user should be able to run docker commands on all three servers.
+
+[NOTE: Write the series of commands to achieve above in this file below the question scenario with documentation]
+
+Good luck!
+
+Elastic ip:
+https://kerneltalks.com/cloud-services/how-to-assign-elastic-ip-to-ec2-linux-instance/
+
+
+************************************************************************************************
+  ON MANAGER NODE:
+  
+1.docker swarm init //initializing docker swarm
+
+Swarm initialized: current node (1hxyajamedfx9fpcitjesfxy0) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-64ovw2mumvwx4pio3ffi56ok3mb4qy0utck07d2m71shyplcf4-bjn93xo1jynq1akbexm0r5mo2 172.31.90.251:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+2.docker info //here we can able to see swarm under active mode
+
+root@ip-172-31-90-251:/home/ubuntu# docker info
+Client:
+ Debug Mode: false
+
+Server:
+ Containers: 14
+  Running: 0
+  Paused: 0
+  Stopped: 14
+ Images: 16
+ Server Version: 19.03.5
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+ Logging Driver: syslog
+ Cgroup Driver: cgroupfs
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+ Swarm: active
+  NodeID: 1hxyajamedfx9fpcitjesfxy0
+  Is Manager: true
+  ClusterID: z7017czznw73o3ilm3bnr74z8
+  Managers: 1
+  Nodes: 1
+  Default Address Pool: 10.0.0.0/8
+  SubnetSize: 24
+  Data Path Port: 4789
+  Orchestration:
+   Task History Retention Limit: 5
+
+
+3.docker node ls //here we can see the node is a leader node.
+
+root@ip-172-31-90-251:/home/ubuntu# docker node ls
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+1hxyajamedfx9fpcitjesfxy0 *   ip-172-31-90-251    Ready               Active              Leader              19.03.5
+root@ip-172-31-90-251:/home/ubuntu#
+
+ON WORKERS:
+
+1.created 2 ubuntu instance on aws & installed required softwares on both of them.
+2.sanity check for docker installation
+root@ip-172-31-90-217:/home/ubuntu# docker version
+Client:
+ Version:           18.09.5
+ API version:       1.39
+ Go version:        go1.10.8
+ Git commit:        e8ff056
+ Built:             Thu Apr 11 04:43:57 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          18.09.5
+  API version:      1.39 (minimum version 1.12)
+  Go version:       go1.10.8
+  Git commit:       e8ff056
+  Built:            Thu Apr 11 04:10:53 2019
+  OS/Arch:          linux/amd64
+  Experimental:     false
+
+3. 
+         NODE1 
+use join command to join with manager    
+root@ip-172-31-90-217:/home/ubuntu#  docker swarm join \
+>     --token SWMTKN-1-64nypaa7254vx21s7fhyqrm8tk3b2hn5y9vrehrsizbvodz8uf-8tlhlf8q31popwzpzapn8uwrv \
+>     192.168.65.2:2377
+
+This node joined a swarm as a worker.
+
+        NODE2
+use join command to join with manager    
+
+ubuntu@ip-172-31-88-38:~$ sudo su
+root@ip-172-31-88-38:/home/ubuntu# docker swarm join --token SWMTKN-1-64ovw2mumvwx4pio3ffi56ok3mb4qy0utck07d2m71shyplcf4-bjn93xo1jynq1akbexm0r5mo2 172.31.90.251:2377
+This node joined a swarm as a worker.
+
+4.we can able to see one manger&2 nodes as follows after swarm mode 
+root@ip-172-31-90-251:/home/ubuntu# docker info
+Client:
+ Debug Mode: false
+
+Server:
+ Containers: 14
+  Running: 0
+  Paused: 0
+  Stopped: 14
+ Images: 16
+ Server Version: 19.03.5
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+ Logging Driver: syslog
+ Cgroup Driver: cgroupfs
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+ Swarm: active
+  NodeID: 1hxyajamedfx9fpcitjesfxy0
+  Is Manager: true
+  ClusterID: z7017czznw73o3ilm3bnr74z8
+  Managers: 1
+  Nodes: 3
+  Default Address Pool: 10.0.0.0/8
+  SubnetSize: 24
+  Data Path Port: 4789
+  Orchestration:
+

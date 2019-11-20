@@ -1,0 +1,173 @@
+Your supermarket company is working on expanding their Docker infrastructure. 
+They have an existing service that provides a list of fruit sold in their stores. 
+After measuring the amount of load on this service, they have asked you to scale this service up to a higher number of replicas.
+
+In addition, there is a new service that provides a list of vegetables. This new service needs to be created in the cluster. 
+Set up the swarm cluster to complete the lab, ensure that the swarm meets the following specifications:
+
+1. Scale the service called products-fruit to 5 replicas.
+
+->docker pull linuxacademycontent/vegetable-service:1.0.0
+
+root@ip-172-31-90-251:/home/ubuntu# docker pull linuxacademycontent/fruit-service:1.0.0
+1.0.0: Pulling from linuxacademycontent/fruit-service
+6ae821421a7d: Already exists
+da4474e5966c: Already exists
+eb2aec2b9c9f: Already exists
+6db9559a05fd: Pull complete
+2d0ed4a8f229: Pull complete
+Digest: sha256:c904541d6a51932256baaa1163c2b7947c4bc7168439631d931f08c6f7635112
+Status: Downloaded newer image for linuxacademycontent/fruit-service:1.0.0
+docker.io/linuxacademycontent/fruit-service:1.0.0
+
+->docker service create --replicas=5 --name products-fruit -p 8080:80 linuxacademycontent/fruit-service:1.0.0
+
+root@ip-172-31-90-251:/home/ubuntu# docker service create --replicas=5 --name products-fruit -p 8080:80 linuxacademycontent/fruit-service:1.0.0
+rw1ssi44b2yho44wu5d7cw45g
+overall progress: 5 out of 5 tasks
+1/5: running   [==================================================>]
+2/5: running   [==================================================>]
+3/5: running   [==================================================>]
+4/5: running   [==================================================>]
+5/5: running   [==================================================>]
+verify: Service converged
+
+
+2. Create a new service called products-vegetables running the linuxacademycontent/vegetable-service:1.0.0 image.
+
+ ->docker pull linuxacademycontent/vegetable-service:1.0.0 
+ 
+ root@ip-172-31-90-251:/home/ubuntu# docker pull linuxacademycontent/vegetable-service:1.0.0
+1.0.0: Pulling from linuxacademycontent/vegetable-service
+6ae821421a7d: Already exists
+da4474e5966c: Already exists
+eb2aec2b9c9f: Already exists
+3e55604f8d01: Pull complete
+45cded7731f3: Pull complete
+Digest: sha256:958b5932d3b926d77efe4b1b2083060de28054d153daabdbc584c3bda2523958
+Status: Downloaded newer image for linuxacademycontent/vegetable-service:1.0.0
+docker.io/linuxacademycontent/vegetable-service:1.0.0
+
+->docker service create --replicas=1 --name products-vegetables -p 8081:80 linuxacademycontent/vegetable-service:1.0.0
+
+root@ip-172-31-90-251:/home/ubuntu# docker service create --replicas=1 --name products-vegetables -p 8081:80 linuxacademycontent/vegetable-service:1.0.0
+8u3zv738uowfq985ndhs7dn57
+overall progress: 1 out of 1 tasks
+1/1: running   [==================================================>]
+verify: Service converged
+
+
+->docker ps
+root@ip-172-31-90-251:/home/ubuntu# docker ps
+CONTAINER ID        IMAGE                                         COMMAND                  CREATED             STATUS              PORTS                            NAMES
+8e40c641561d        linuxacademycontent/fruit-service:1.0.0       "nginx -g 'daemon of…"   About an hour ago   Up About an hour    80/tcp                           products-fruit.4.nwkw18ewbsmy39l8qza6eu4zr
+3995db88782f        linuxacademycontent/vegetable-service:1.0.0   "nginx -g 'daemon of…"   About an hour ago   Up About an hour    80/tcp                           products-vegetables.1.otu35z0de127dhxbcoannm819
+0351187f18c1        linuxacademycontent/fruit-service:1.0.0       "nginx -g 'daemon of…"   2 hours ago         Up 2 hours          80/tcp                           products-fruit.5.w40x19lsnxs4rn5fk3qgtzejs
+bcdf44beee83        linuxacademycontent/fruit-service:1.0.0       "nginx -g 'daemon of…"   2 hours ago         Up 2 hours          80/tcp                           products-fruit.3.runhvgbburu8nd9ir7om71no5
+381a956500c5        linuxacademycontent/fruit-service:1.0.0       "nginx -g 'daemon of…"   2 hours ago         Up 2 hours          80/tcp                           products-fruit.2.rfeatp25crvqyfi7d0v372sv9
+ce610caaf55f        linuxacademycontent/fruit-service:1.0.0       "nginx -g 'daemon of…"   2 hours ago         Up 2 hours          80/tcp                           products-fruit.1.3i6sqzkefp9s1ix2qtpdxisgx
+
+
+
+3. Publish products-vegetables on port 8081. The application listens on port 80.
+
+->curl localhost:8081
+
+root@ip-172-31-90-251:/home/ubuntu# curl localhost:8081
+{
+    "description": "A list of vegetables.",
+    "vegetables": [
+        "acorn squash",
+        "alfalfa sprout",
+        "amaranth",
+        "anise",
+        "artichoke",
+        "arugula",
+        "asparagus",
+        "aubergine",
+        "azuki bean",
+        "banana squash",
+        "yam",
+        "zucchini"
+    ]
+}
+
+
+4. Run products-vegetables with 3 replicas.
+
+->docker service rm vegetable-service:1.0.0
+
+root@ip-172-31-90-251:/# docker service rm vegetable-service:1.0.0
+Error: No such service: vegetable-service:1.0.0
+root@ip-172-31-90-251:/# docker service update --replicas=3 products-vegetables
+products-vegetables
+overall progress: 3 out of 3 tasks
+1/3: running   [==================================================>]
+2/3: running   [==================================================>]
+3/3: running   [==================================================>]
+verify: Service converged
+
+->docker service ps products-vegetables
+
+root@ip-172-31-90-251:/# docker service ps products-vegetables
+ID                  NAME                    IMAGE                                         NODE                DESIRED STATE       CURRENT STATE                ERROR               PORTS
+otu35z0de127        products-vegetables.1   linuxacademycontent/vegetable-service:1.0.0   ip-172-31-90-251    Running             Running 3 hours ago                       
+dj0ers2v4znh        products-vegetables.2   linuxacademycontent/vegetable-service:1.0.0   ip-172-31-90-251    Running             Running about a minute ago                
+j8kl9wf1rxr8        products-vegetables.3   linuxacademycontent/vegetable-service:1.0.0   ip-172-31-90-251    Running             Running about a minute ago                
+root@ip-172-31-90-251:/#
+
+    or
+
+-> docker service update --replicas=3 products-vegetables
+ 
+ root@ip-172-31-90-251:/# docker service scale products-vegetables=2
+products-vegetables scaled to 2
+overall progress: 2 out of 2 tasks
+1/2: running   [==================================================>]
+2/2: running   [==================================================>]
+verify: Service converged
+
+root@ip-172-31-90-251:/# docker service ps products-vegetables
+ID                  NAME                    IMAGE                                         NODE                DESIRED STATE       CURRENT STATE            ERROR               PORTS
+otu35z0de127        products-vegetables.1   linuxacademycontent/vegetable-service:1.0.0   ip-172-31-90-251    Running             Running 3 hours ago                       
+dj0ers2v4znh        products-vegetables.2   linuxacademycontent/vegetable-service:1.0.0   ip-172-31-90-251    Running             Running 12 minutes ago                    
+
+You can test the products-fruit service from any swarm node (including the manager) with curl localhost:8080.
+
+root@ip-172-31-90-251:/# curl localhost:8080
+{
+  "description": "A list of fruits.",
+  "fruits": [
+    "apple",
+    "apricot",
+    "avocado",
+    "banana",
+    "bell pepper",
+    "tangerine",
+    "tomato",
+    "ugli fruit",
+    "watermelon"
+  ]
+}
+
+Once products-vegetables is running, you should be able to test it from any swarm node (including the manager) with curl localhost:8081.
+
+root@ip-172-31-90-251:/# curl localhost:8081
+{
+    "description": "A list of vegetables.",
+    "vegetables": [
+        "acorn squash",
+        "alfalfa sprout",
+        "amaranth",
+        "anise",
+        "artichoke",
+        "arugula",
+        "water chestnut",
+        "watercress",
+        "white radish",
+        "yam",
+        "zucchini"
+    ]
+}
+
+Good luck!
